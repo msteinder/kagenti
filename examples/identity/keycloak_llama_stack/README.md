@@ -9,18 +9,18 @@ This tutorial is broken down into the following steps:
 - [Step 0: Prerequisites](#step-0-prerequisites)
 - [Step 1: Setup the Tool components](#step-1-setup-the-tool-components)
   - [Step 1a: Run and setup Keycloak](#step-1a-run-and-setup-keycloak)
-  - Step 1b: Run the Golang Server
-  - Step 1c: Run the MCP Server
-- Step 2: Setup the Llama Stack Components
-  - Step 2a: Setup and Run the Llama Stack Server
-  - Step 2b: Register the toolgroup with the Llama Stack Server
-- Step 3: Make a tool call
-  - Case 3a: Make a tool call with no access token
-  - Case 3b: Make a tool call with the right access token
+  - [Step 1b: Run the Golang Server](#step-1b-run-the-golang-server)
+  - [Step 1c: Run the MCP Server](#step-1c-run-the-mcp-server)
+- [Step 2: Setup the Llama Stack Components](#step-2-setup-the-llama-stack-components)
+  - [Step 2a: Setup and Run the Llama Stack Server](#step-2a-setup-and-run-the-llama-stack-server)
+  - [Step 2b: Register the toolgroup with the Llama Stack Server](#step-2b-register-the-toolgroup-with-the-llama-stack-server)
+- [Step 3: Make a tool call](#step-3-make-an-unauthorized-tool-call)
+  - [Step 3a: Make an unauthorized tool call](#step-3a-make-an-unauthorized-tool-call)
+  - [Step 3b: Make an authorized tool call](#step-3b-make-an-authorized-tool-call)
 
 ## Step 0: Prerequisites
 
-- Install the Prereqs in [pocs](./docs/pocs.md#prereqs)
+- Install the Prereqs in [pocs](../../../docs/pocs.md#prereqs)
   - Python 3.11+
   - [conda-forge](https://conda-forge.org/download/)
   - [ollama](https://ollama.com/download)
@@ -111,7 +111,7 @@ curl -sX POST -H "Content-Type: application/x-www-form-urlencoded" \
 
 ### Step 1b: Run the Golang Server
 
-The implementation of the Golang server can be found [here](golang_server/). Run it in a separate terminal with the following command:
+The implementation of the Golang server can be found [here](./golang_server/). Run it in a separate terminal with the following command:
 
 ```shell
 ./examples/identity/keycloak_llama_stack/golang_server/com.example.webserver -issuer "http://localhost:8080/realms/demo"
@@ -149,7 +149,7 @@ llama stack run stack/templates/ollama/run.yaml
 
 When running the server on Mac, you might get a pop-up asking to `accept incoming network connections`, so just click **Allow**.  
 
-## Step 2b: Register the toolgroup with the Llama Stack Server
+### Step 2b: Register the toolgroup with the Llama Stack Server
 
 Activate the environment.
 
