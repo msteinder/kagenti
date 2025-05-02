@@ -31,9 +31,9 @@ def run_main(
     list_toolgroups: bool,
     toolgroup_id: str,
     mcp_endpoint: str,
+    mcp_fetch_url: str,
+    api_key: str,
 ):
-    api_key = "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJ3dGRua2FtNk9DdGpLcTRuRmsxcjhscjdCU2l1Q1NjZW4taHE3RC1aZVlJIn0.eyJleHAiOjE3NDU5NDkzMzgsImlhdCI6MTc0NTk0OTAzOCwianRpIjoib25ydHJvOmFiZjIwM2QzLTRiOTAtNGM5Zi05ZDFkLWU0ODg0NDEyOGNhZSIsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MC9yZWFsbXMvZGVtbyIsImF1ZCI6WyJteS1leHRlcm5hbC10b29sIiwiYWNjb3VudCJdLCJzdWIiOiI5YmI2NTQ1ZS0wN2NmLTRiNzQtOTQxMi1hMmY1MGNiYmRlNmUiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJsbGFtYV9zdGFjayIsInNpZCI6IjE5MmM5MGM5LTFmNTAtNGMwNy1hM2VmLTI0MjdhMzNkYTExNCIsImFjciI6IjEiLCJhbGxvd2VkLW9yaWdpbnMiOlsiLyoiXSwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbIm9mZmxpbmVfYWNjZXNzIiwidW1hX2F1dGhvcml6YXRpb24iLCJkZWZhdWx0LXJvbGVzLWRlbW8iXX0sInJlc291cmNlX2FjY2VzcyI6eyJhY2NvdW50Ijp7InJvbGVzIjpbIm1hbmFnZS1hY2NvdW50IiwibWFuYWdlLWFjY291bnQtbGlua3MiLCJ2aWV3LXByb2ZpbGUiXX19LCJzY29wZSI6InByb2ZpbGUgZW1haWwiLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwibmFtZSI6ImFsYW4gYWxhbiIsInByZWZlcnJlZF91c2VybmFtZSI6ImFsYW4iLCJnaXZlbl9uYW1lIjoiYWxhbiIsImZhbWlseV9uYW1lIjoiYWxhbiIsImVtYWlsIjoiYWxhbkBhbGFuLmNvbSJ9.em1Pb72g4KAQuQB9bv2SSVeMAUwi1F0BoEQ9qz8k3N0hNckAIXvgKMShe-XilM25KMTGFPEX8J_Ue2OtzFrI4zmFsq7fkm6D4knPMqxjFIvr8PSAgDFKUDqOkc3pRg0a_G7wKPdQ7g9lqOUTBPIbCUJakewNS4XxR0U8IdcRrsqEs-oaWHp7aX2IIS0A-SdSrrmW3ah0zWNTXLb24nSCK0ykt3Q6YRMmYGUCboICa-2SzeIUd9BaqSOr8cXcZ7IBUxwMJth1XSg9DOgwUL-eQ4svJTVbngmWPTetCmnYeC6HmP2qQ5mlc_E7dP4Ux9J2MIMAfrn_Apvj3nlMykLBJA"
-
     client = LlamaStackClient(
         base_url=f"http://{host}:{port}",
         provider_data={
@@ -85,7 +85,7 @@ def run_main(
     result = client.tool_runtime.invoke_tool(
         tool_name="fetch",
         kwargs={
-            "url": "http://localhost:10000"
+            "url": mcp_fetch_url
         },
     )
     print(result)
@@ -125,6 +125,20 @@ if __name__ == "__main__":
         default="http://localhost:8000/sse",
         help="Specify the MCP endpoint.",
     )
+    parser.add_argument(
+        "--mcp_fetch_url",
+        type=str,
+        required=False,
+        default="https://raw.githubusercontent.com/kubestellar/kubeflex/refs/heads/main/docs/contributors.md",
+        help="Specify where the MCP server fetches",
+    )
+    parser.add_argument(
+        "--access_token",
+        type=str,
+        required=False,
+        default="some-api-key",
+        help="Bearer token for tool at MCP Fetch URL",
+    )
 
     args = parser.parse_args()
 
@@ -136,4 +150,6 @@ if __name__ == "__main__":
         register_toolgroup=args.register_toolgroup,
         toolgroup_id=args.toolgroup_id,
         mcp_endpoint=args.mcp_endpoint,
+        mcp_fetch_url=args.mcp_fetch_url,
+        api_key=args.access_token,
     )
