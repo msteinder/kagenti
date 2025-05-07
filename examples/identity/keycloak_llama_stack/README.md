@@ -60,9 +60,41 @@ podman|docker run --name keycloak -p 8080:8080 \
 
 This runs Keycloak at http://localhost:8080 with username `admin` and password `admin`.
 
-#### Setup Keycloak [TODO: automate]
+#### Setup Keycloak
 
-First let's create a demo:
+We have a script to automate the configuration of Keycloak. The script does the following:
+* Create a `demo` realm
+* Create a `test` user with a password `test_password`
+* Create a `my-external-tool` client
+* Create a `llama-stack` client
+* Create a `tool-audience` client scope that enables `llama-stack` to access `my-external-tool`
+
+To prepare for the script, create a virtual Python environment, activate the environment, and install Python modules.
+```shell
+python -m venv venv
+. venv/bin/activate
+pip install -r requirements.txt
+```
+
+Then run the script.
+
+```shell
+python keycloak_setup.py
+```
+
+After the configuration, you can now simulate login and delegating temporary user permission using the following command:
+
+```shell
+curl -sX POST -H "Content-Type: application/x-www-form-urlencoded" \
+    -d "grant_type=password" \
+    -d "username=test" \
+    -d "password=test_password" \
+    -d "client_id=llama-stack" \
+    -d "scope=tool-audience" \
+    "http://localhost:8080/realms/demo/protocol/openid-connect/token" | jq
+```
+
+<!-- First let's create a demo:
 
 1. Access Keycloak at http://localhost:8080/ (credentials: `admin`/`admin`)
 2. Create a new realm `demo` [this is case-sensitive] by clicking `Manager realms` in the left sidebar and clicking `Create realm`
@@ -100,7 +132,7 @@ Let's set up the client scope related to this tool:
 5. Now go to `Clients > llama-stack > Client scopes > llama-stack-dedicated > Scope` and set `Full scope allowed` to `Off`.
 5. Finally, let's add the client scope to the `llama-stack` client profile in Keycloak. Go to `Clients > llama-stack > Client scopes > Add client scope`. Select `tool-audience`. Add as `Optional`.
 
-With the above, you can now simulate login and delegating termporary user permission using the following command:
+With the above, you can now simulate login and delegating temporary user permission using the following command:
 
 ```shell
 curl -sX POST -H "Content-Type: application/x-www-form-urlencoded" \
@@ -110,20 +142,20 @@ curl -sX POST -H "Content-Type: application/x-www-form-urlencoded" \
     -d "client_id=llama-stack" \
     -d "scope=tool-audience" \
     "http://localhost:8080/realms/demo/protocol/openid-connect/token" | jq
-```
+``` -->
 
 You should see a response similar to the following:
 
 ```json
 {
-  "access_token": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICI4YUxUVXkwTTI0NVAxYVVVY3FxTHJ5bjNqSXl1dDdpaXUwTGhGR2E4bEI4In0.eyJleHAiOjE3NDYzOTU2ODgsImlhdCI6MTc0NjM5NTM4OCwianRpIjoib25ydHJvOjZlMDc5MmNhLThhNWQtNGFmMS05MTY5LTk3MGFlMTlhMTQ1OSIsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MC9yZWFsbXMvZGVtbyIsImF1ZCI6Im15LWV4dGVybmFsLXRvb2wiLCJzdWIiOiI1N2E5MjljZS02MGEyLTQ2ODEtYmQzZi00ZjQ2OGZjODM2ZDkiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJsbGFtYS1zdGFjayIsInNpZCI6IjQ4ZWNlZmIzLTlhMWEtNDZhZi1iYzA1LTFmNDM5Nzc4YTEyZCIsImFjciI6IjEiLCJhbGxvd2VkLW9yaWdpbnMiOlsiLyoiXSwic2NvcGUiOiJwcm9maWxlIGVtYWlsIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJuYW1lIjoiYWxhbiBhbGFuIiwicHJlZmVycmVkX3VzZXJuYW1lIjoiYWxhbiIsImdpdmVuX25hbWUiOiJhbGFuIiwiZmFtaWx5X25hbWUiOiJhbGFuIiwiZW1haWwiOiJhbGFuQGFsYW4uY29tIn0.nwdbONncrPT086qCQQfjvOn-h2SqzVYfke6MaPSEm6z48XH2B4FKwGVmjmiSJYz7ZGZdLUJj3Tq-L1fXd5IzquNFc_s4PtcqncOU-jSVO9Rd_mVitspt71iGM6B1B_CWi_Pzn4RvF1Ki0Or7RfExvGyRKPPJ_PprqQr4lgACMyvMYUVoQI1pBkSRMZUlHYLmcr8BwjgmskItNAH2naEZoOqbS8RQ7zpgmmbydbLw-r6avgYCwrgPLC0hT-BOUl52QJg_ypUdOYtn8f7vC5xwg5E1SZ91tzfU-D_w6bC8bBzV3_JCIFszFpz6l3OwPdRZzjMeCmWAPKF8Pe6B6UDZtw",
+  "access_token": "...",
   "expires_in": 300,
   "refresh_expires_in": 1800,
-  "refresh_token": "eyJhbGciOiJIUzUxMiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICIyMjQ4YTMyOS1iM2MxLTRlMTItOGU1OS0wMjEyYTMzOGEwMDkifQ.eyJleHAiOjE3NDYzOTcxODgsImlhdCI6MTc0NjM5NTM4OCwianRpIjoiODI0Y2NiMWMtYjhmZS00ZWZmLTlkNTItOWQ3MDhmMDAxMTQ2IiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwL3JlYWxtcy9kZW1vIiwiYXVkIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwL3JlYWxtcy9kZW1vIiwic3ViIjoiNTdhOTI5Y2UtNjBhMi00NjgxLWJkM2YtNGY0NjhmYzgzNmQ5IiwidHlwIjoiUmVmcmVzaCIsImF6cCI6ImxsYW1hLXN0YWNrIiwic2lkIjoiNDhlY2VmYjMtOWExYS00NmFmLWJjMDUtMWY0Mzk3NzhhMTJkIiwic2NvcGUiOiJwcm9maWxlIHJvbGVzIHRvb2wtYXVkaWVuY2UgYmFzaWMgd2ViLW9yaWdpbnMgYWNyIGVtYWlsIn0.S2Ce4wy3E92krRpSOre2V84emMjJUAaQ00TMX_tet3ZmkrW1m-s_rUtH2DXMnYiB3RVH1344NSfkLboRz7dTGg",
+  "refresh_token": "...",
   "token_type": "Bearer",
   "not-before-policy": 0,
-  "session_state": "48ecefb3-9a1a-46af-bc05-1f439778a12d",
-  "scope": "profile email"
+  "session_state": "fa850a8e-e8d2-4743-a97d-297da69e37ad",
+  "scope": "email tool-audience profile"
 }
 ```
 
@@ -132,7 +164,7 @@ You should see a response similar to the following:
 The implementation of the Golang server can be found [here](./golang_server/). Run it in a separate terminal with the following command:
 
 ```shell
-./golang_server/com.example.webserver -issuer "http://localhost:8080/realms/demo"
+./examples/identity/keycloak_llama_stack/golang_server/com.example.webserver -issuer "http://localhost:8080/realms/demo"
 ```
 
 This runs the server on http://localhost:10000 and validates received JWTs against the Keycloak we are running.
@@ -148,8 +180,7 @@ conda activate stack
 Finally, we can run the MCP Server so that the Llama Stack server can make MCP calls to our running golang server. Open a new terminal:
 
 ```shell
-cd ../mcp
-uv run sse_server.py
+uv run examples/mcp/sse_server.py
 ```
 
 ## Step 2: Setup the Llama Stack components
@@ -167,7 +198,7 @@ conda activate stack
 Run the Llama Stack server. This particular distribution requires ollama.
 
 ```shell
-cd ../../providers
+cd providers
 export INFERENCE_MODEL="meta-llama/Llama-3.2-3B-Instruct"
 llama stack run templates/ollama/run.yaml
 ```
@@ -185,7 +216,6 @@ conda activate stack
 To register the tool group with the server, run:
 
 ```shell
-cd .. 
 python -m examples.clients.mcp.tool-util --host localhost --port 8321 --register_toolgroup
 ```
 
@@ -198,6 +228,12 @@ pip install llama_stack_client==v0.1.6
 ## Step 3: Make a tool call
 
 ### Step 3a: Make an unauthorized tool call
+
+Create another terminal instance and activate the Conda environment again.
+
+```shell
+conda activate stack
+```
 
 We can make a tool call to request the golang server with the following command:
 
@@ -224,18 +260,11 @@ Evidently, we are passing the string `some-api-key` as the bearer token.
 
 Let's obtain a proper access token. We can use the curl command from above to store the access token in an environment variable:
 
-First provide the Keycloak user's credentials:
-
-```shell
-export USER_NAME=<username>
-export USER_PASSWORD=<password>
-```
-
 ```shell
 export ACCESS_TOKEN=$(curl -sX POST -H "Content-Type: application/x-www-form-urlencoded" \
     -d "grant_type=password" \
-    -d "username=$USER_NAME" \
-    -d "password=$USER_PASSWORD" \
+    -d "username=test" \
+    -d "password=test_password" \
     -d "client_id=llama-stack" \
     -d "scope=tool-audience" \
     "http://localhost:8080/realms/demo/protocol/openid-connect/token" | jq -r .access_token)
