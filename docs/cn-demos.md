@@ -79,6 +79,35 @@ open http://kagenti-ui.localtest.me:8080
 You can import agents written in any framework and wrapped with a2a or acp from github repos, test the agents
 and monitor traces and network traffic. You may also import mcp server from source and deploys them on the platform.
 
+## Identity
+
+To verify OIDC service for SPIRE is properly setup:
+
+```shell
+curl http://spire-oidc.localtest.me:8080/keys
+curl http://spire.localtest.me:8080/.well-known/openid-configuration
+```
+
+Check if Tornjak started correctly.
+
+Test the Tornjak API access:
+
+```shell
+curl http://spire-tornjak-api.localtest.me:8080/
+```
+
+This should return something like:
+
+```console
+"Welcome to the Tornjak Backend!"
+```
+
+Now test the Tornjak UI access:
+
+```shell
+open http://spire-tornjak-ui.localtest.me:8080/
+```
+
 ## Troubleshooting
 
 ### kagenti-installer reports "exceeded its progress deadline"
